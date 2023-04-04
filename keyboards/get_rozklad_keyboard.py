@@ -18,10 +18,17 @@ def chose_faculty_group_arr(faculty):
 class main_keyboard:
     def rozklad_panel(self):
         get_rozklad_button = KeyboardButton('/Отримати_Розклад')
+        option_button = KeyboardButton('/Налаштування')
         start_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
         start_keyboard.add(get_rozklad_button)
+        start_keyboard.add(option_button)
         return start_keyboard
-
+    def options_panel(self):
+        options_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+        notification_button = KeyboardButton('/Авто_Нагадування')
+        main_menu_button = KeyboardButton('/Головне_меню')
+        options_keyboard.add(notification_button).add(main_menu_button)
+        return options_keyboard
     def faculty_panel(self):
         faculty_fizmath = KeyboardButton('Фіз-мат')
         faculty_sport = KeyboardButton('Спорт')
@@ -39,6 +46,7 @@ class main_keyboard:
         first_m_course = KeyboardButton('1-магістр')
         second_m_course = KeyboardButton('2-магістр')
         group_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+        group_keyboard.add(KeyboardButton('/Скасувати'))
         group_keyboard.row(first_course,second_course ).row(third_course,fourth_course).row(first_m_course,second_m_course)
         return group_keyboard
 
@@ -46,6 +54,7 @@ class main_keyboard:
     def get_groups_panel(self, faculty, course):
         group_arr = chose_faculty_group_arr(faculty)
         group_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+        group_keyboard.add(KeyboardButton('/Скасувати'))
         if course == '1-магістр':
             course = 5
         elif course == '2-магістр':

@@ -9,7 +9,8 @@ def db_init ():
     main_db.execute('CREATE TABLE IF NOT EXISTS users(tg_id TEXT PRIMARY KEY,faculty,course,groupe)')
     main_db.commit()
 
-
+def check_user(id):
+    return cur.execute(f'SELECT * FROM users WHERE tg_id = {id}')
 async def db_add_user(state):
     async with state.proxy() as data:
         cur.execute('INSERT INTO users VALUES (?,?,?,?)', (tuple(data.values())))
