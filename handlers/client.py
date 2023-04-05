@@ -5,6 +5,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher.filters import Text
 from keyboards import main_keyboard
 from data_base import users_db
+from rozklad_api import ksu_api
 keyboard = main_keyboard()
 
 class FSMAdmin(StatesGroup):
@@ -14,16 +15,28 @@ class FSMAdmin(StatesGroup):
     groupe = State()
 
 async def start_key(message : types.Message):
-    await message.answer("Доброго дня",reply_markup=keyboard.rozklad_panel())
+    await message.answer("Введіть команду",reply_markup=keyboard.rozklad_panel())
     #await message.reply(message.text)
 async def options(message : types.Message):
     await message.answer("Налаштування", reply_markup=keyboard.options_panel())
+async def delete_user(message : types.Message):
+    await users_db.delete_user(message.from_user.id)
+    await message.answer('Ваші данні видалено, зареєструйтесь знову')
+    await start_key(message)
 async def rozklad_request(message : types.Message):
-    if users_db.check_user(message.from_user.id) == False:
+    print(users_db.check_user(message.from_user.id))
+    if users_db.check_user(message.from_user.id) == []:
         await FSMAdmin.faculty.set()
         await message.reply("Вибери свій факультет",reply_markup=keyboard.faculty_panel())
     else:
-        print('2')
+        await message.answer('Розклад на сьогодні')
+        arr = (ksu_api.get_rozklad_api(users_db.get_user_groupe(message.from_user.id)))
+        for item in arr:
+            try:
+                await message.answer(item)
+            except:
+                continue
+
 
 async def get_faculty(message : types.Message, state: FSMContext):
     if message.text == '/Скасувати' or message.text == 'Скасувати':
@@ -53,6 +66,7 @@ async def get_groupe(message : types.Message, state: FSMContext):
             await users_db.db_add_user(state)
             await message.answer('Ваші данні збережено',reply_markup=keyboard.rozklad_panel())
             await message.answer(f'Ваша група {data["group"]}')
+            await rozklad_request(message)
         await state.finish()
 async def cancel_reg(message: types.Message, state: FSMContext):
     if message.text == '/Скасувати' or message.text == 'Скасувати':
@@ -69,6 +83,7 @@ async def cancel_reg(message: types.Message, state: FSMContext):
 def register_handlers_client(dp : Dispatcher):
     dp.register_message_handler(start_key ,commands=['start'])
     dp.register_message_handler(options, commands=['Налаштування'])
+    dp.register_message_handler(delete_user, commands=['Змінити_групу'])
     dp.register_message_handler(start_key, commands=['Головне_меню'])
     dp.register_message_handler(rozklad_request, commands=['Отримати_Розклад'], state=None)
     dp.register_message_handler(get_faculty, state=FSMAdmin.faculty)

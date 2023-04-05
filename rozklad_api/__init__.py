@@ -1,0 +1,1 @@
+from rozklad_api import ksu_api
