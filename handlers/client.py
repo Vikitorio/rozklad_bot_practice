@@ -23,6 +23,8 @@ async def options(message : types.Message):
     await message.answer("Налаштування", reply_markup=keyboard.options_panel())
 async def notification_options(message : types.Message):
     await message.answer("Виберіть тип чи ввімкнути нагадування", reply_markup=keyboard.notification_panel())
+async def news_options(message : types.Message):
+    await message.answer("Виберіть тип чи ввімкнути отримування новин інституту", reply_markup=keyboard.news_panel())
 async def set_notification_button(message : types.Message):
     if users_db.check_user(message.from_user.id):
         users_db.set_notification(message.from_user.id,'8')
@@ -34,6 +36,20 @@ async def remove_notification_button(message: types.Message):
     if users_db.check_user(message.from_user.id):
         users_db.remove_notification(message.from_user.id)
         await message.answer("Нагадування вимкнено", reply_markup=keyboard.rozklad_panel())
+    else:
+        await message.answer("Ви не зареєстровані")
+
+async def set_news_button(message : types.Message):
+    if users_db.check_user(message.from_user.id):
+        users_db.set_news(message.from_user.id)
+        await message.answer("Отримання новин ввімкнено", reply_markup=keyboard.rozklad_panel())
+    else:
+        await message.answer("Ви не зареєстровані")
+
+async def remove_news_button(message: types.Message):
+    if users_db.check_user(message.from_user.id):
+        users_db.remove_news(message.from_user.id)
+        await message.answer("Отримання новин вимкнено", reply_markup=keyboard.rozklad_panel())
     else:
         await message.answer("Ви не зареєстровані")
 async def delete_user(message : types.Message):
@@ -107,8 +123,11 @@ def register_handlers_client(dp : Dispatcher):
     dp.register_message_handler(rozklad_file_request, commands=['Отримати_Файл_Розкладу'])
     dp.register_message_handler(options, commands=['Налаштування'])
     dp.register_message_handler(notification_options, commands=['Нагадування'])
+    dp.register_message_handler(news_options, commands=['Новини'])
     dp.register_message_handler(set_notification_button, commands=['Встановити_Нагадування'])
     dp.register_message_handler(remove_notification_button, commands=['Прибрати_Нагадування'])
+    dp.register_message_handler(set_news_button, commands=['Отримувати_Новини'])
+    dp.register_message_handler(remove_news_button, commands=['Не_Отримувати_Новини'])
     dp.register_message_handler(delete_user, commands=['Змінити_групу'])
     dp.register_message_handler(start_key, commands=['Головне_меню'])
     dp.register_message_handler(rozklad_request, commands=['Отримати_Розклад'], state=None)

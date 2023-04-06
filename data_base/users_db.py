@@ -30,3 +30,9 @@ def set_notification(id,time):
 def remove_notification(id):
     cur.execute(f'UPDATE users SET get_notification = "0" WHERE tg_id = {id}')
     main_db.commit()
+def set_news(id):
+    cur.execute(f'UPDATE users SET get_news = "1" WHERE tg_id = {id}')
+    main_db.commit()
+def remove_news(id):
+    cur.execute(f'UPDATE users SET get_news = "0" WHERE tg_id = {id}')
+    main_db.commit()
