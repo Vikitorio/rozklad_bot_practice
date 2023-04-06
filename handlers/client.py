@@ -74,7 +74,7 @@ async def rozklad_file_request(message : types.Message):
     if users_db.check_user(message.from_user.id):
         file_path = get_file(users_db.get_faculty(message.from_user.id))
         document = types.InputFile(file_path)
-        await bot.send_document(message.chat.id, document, caption='Расписание')
+        await bot.send_document(message.chat.id, document, caption='Розклад')
     else:
         await FSMAdmin.faculty.set()
         await message.reply("Споатку треба зареєструватися\nВибери свій факультет", reply_markup=keyboard.faculty_panel())

@@ -6,8 +6,8 @@ from keyboards import group_list
 def chose_faculty_group_arr(faculty):
     switcher = {
         'Фізики_та_Математики': group_list.fizmat_groups_arr,
-        'Психології_Історії_Соціології': "one",
-        'Біології_Географії_Екології': "two",
+        'Психології_Історії_Соціології': group_list.psychology_groups_arr,
+        'Біології_Географії_Екології': group_list.biology_group_arr,
     }
     return switcher.get(faculty, "nothing")
 class main_keyboard:
@@ -74,9 +74,7 @@ class main_keyboard:
         for x in range(0,len(group_arr[course-1]),2):
             print (x)
             if (len(group_arr[course-1])-(x)) < 2:
-                print("1-if")
                 group_keyboard.add(KeyboardButton(group_arr[course-1][x]))
             else:
-                print("2-if")
                 group_keyboard.row(KeyboardButton(group_arr[course-1][x]),KeyboardButton(group_arr[course-1][x+1]))
         return group_keyboard
