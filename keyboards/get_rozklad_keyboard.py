@@ -6,25 +6,33 @@ from keyboards import group_list
 def chose_faculty_group_arr(faculty):
     switcher = {
         'Фізики_та_Математики': group_list.fizmat_groups_arr,
-        1: "one",
-        2: "two",
+        'Психології_Історії_Соціології': "one",
+        'Біології_Географії_Екології': "two",
     }
     return switcher.get(faculty, "nothing")
 class main_keyboard:
     def rozklad_panel(self):
         get_rozklad_button = KeyboardButton('/Отримати_Розклад')
+        get_rozklad_file_button = KeyboardButton('/Отримати_Файл_Розкладу')
         option_button = KeyboardButton('/Налаштування')
         start_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-        start_keyboard.add(get_rozklad_button)
+        start_keyboard.add(get_rozklad_button).add(get_rozklad_file_button)
         start_keyboard.add(option_button)
         return start_keyboard
     def options_panel(self):
         options_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-        notification_button = KeyboardButton('/Авто_Нагадування')
+        notification_button = KeyboardButton('/Нагадування')
         delete_me_button = KeyboardButton('/Змінити_групу')
         main_menu_button = KeyboardButton('/Головне_меню')
         options_keyboard.row(notification_button,delete_me_button).add(main_menu_button)
         return options_keyboard
+    def notification_panel(self):
+        notification_options_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+        set_notification_button = KeyboardButton('/Встановити_Нагадування')
+        remove_notification_button = KeyboardButton('/Прибрати_Нагадування')
+        main_menu_button = KeyboardButton('/Головне_меню')
+        notification_options_keyboard.add(main_menu_button).add(set_notification_button).add(remove_notification_button)
+        return notification_options_keyboard
     def faculty_panel(self):
         faculty_fizmath = KeyboardButton('Фізики_та_Математики')
         faculty_psychology_history = KeyboardButton('Психології_Історії_Соціології')

@@ -1,0 +1,1 @@
+from rozklad_parser import rozklad_file
