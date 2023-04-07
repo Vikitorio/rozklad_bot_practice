@@ -1,8 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from keyboards import group_list
 
-
-
 def chose_faculty_group_arr(faculty):
     switcher = {
         'Фізики_та_Математики': group_list.fizmat_groups_arr,

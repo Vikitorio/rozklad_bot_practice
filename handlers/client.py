@@ -60,7 +60,7 @@ async def rozklad_request(message : types.Message):
     print(users_db.check_user(message.from_user.id))
     if users_db.check_user(message.from_user.id) == []:
         await FSMAdmin.faculty.set()
-        await message.reply("Споатку треба зареєструватися\nВибери свій факультет",reply_markup=keyboard.faculty_panel())
+        await message.reply("Спочатку треба зареєструватися\nВибери свій факультет",reply_markup=keyboard.faculty_panel())
     else:
         await message.answer('Розклад на сьогодні')
         arr = (ksu_api.get_rozklad_api(users_db.get_user_groupe(message.from_user.id)))
@@ -77,7 +77,7 @@ async def rozklad_file_request(message : types.Message):
         await bot.send_document(message.chat.id, document, caption='Розклад')
     else:
         await FSMAdmin.faculty.set()
-        await message.reply("Споатку треба зареєструватися\nВибери свій факультет", reply_markup=keyboard.faculty_panel())
+        await message.reply("Спочатку треба зареєструватися\nВибери свій факультет", reply_markup=keyboard.faculty_panel())
 async def get_faculty(message : types.Message, state: FSMContext):
     if message.text == '/Скасувати' or message.text == 'Скасувати':
         await state.finish()
@@ -92,12 +92,18 @@ async def get_course(message : types.Message, state: FSMContext):
         await state.finish()
     else:
         async with state.proxy() as data:
-            data['course'] = message.text
+            if message.text == '1-магістр':
+                data['course'] = 5
+            elif message.text == '2-магістр':
+                data['course'] = 6
+            else:
+                data['course'] = message.text
         await FSMAdmin.next()
         await message.reply('Тепер введи групу',reply_markup=keyboard.get_groups_panel(data['faculty'],int(data['course'])))
 async def get_groupe(message : types.Message, state: FSMContext):
     if message.text == '/Скасувати' or message.text == 'Скасувати':
         await state.finish()
+        await message.answer("Введіть команду", reply_markup=keyboard.rozklad_panel())
     else:
         async with state.proxy() as data:
             data['group'] = message.text
@@ -120,6 +126,7 @@ async def cancel_reg(message: types.Message, state: FSMContext):
 
 def register_handlers_client(dp : Dispatcher):
     dp.register_message_handler(start_key ,commands=['start'])
+    dp.register_message_handler(start_key, commands=['Головне_меню'])
     dp.register_message_handler(rozklad_file_request, commands=['Отримати_Файл_Розкладу'])
     dp.register_message_handler(options, commands=['Налаштування'])
     dp.register_message_handler(notification_options, commands=['Нагадування'])

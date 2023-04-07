@@ -1,2 +1,3 @@
 from keyboards.get_rozklad_keyboard import main_keyboard
+from keyboards.admin_keyboard import main_admin_keyboard
 from keyboards import group_list

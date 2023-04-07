@@ -7,11 +7,27 @@ def db_init ():
     if main_db:
         print("Підєднались до бд")
     main_db.execute('CREATE TABLE IF NOT EXISTS users (tg_id TEXT PRIMARY KEY,faculty,course,groupe,next_notification,notification_time,get_notification DEFAULT 0,get_news DEFAULT 1)')
+    main_db.execute('CREATE TABLE IF NOT EXISTS admins (tg_id TEXT PRIMARY KEY)')
     main_db.commit()
 def get_user_groupe(user_id):
-    return cur.execute(f'SELECT groupe FROM users WHERE tg_id = {user_id}').fetchall()[0]
+    return cur.execute(f'SELECT groupe FROM users WHERE tg_id = {user_id}').fetchall()[0][0]
 def check_user(id):
     return cur.execute(f'SELECT * FROM users WHERE tg_id = {id}').fetchall()
+def get_users_id_list(faculty,course,groupe):
+    filter = 'SELECT tg_id FROM users '
+    if faculty != 'False' and faculty != False:
+        filter = filter + f"WHERE faculty = '{faculty}'"
+    if course != 'False' and course != False:
+        filter = filter + f" AND course = '{course}'"
+    if groupe != 'False' and groupe != False:
+        filter = filter + f" AND groupe = '{groupe}'"
+    print(filter)
+    print(cur.execute(filter).fetchall())
+    return cur.execute(filter).fetchall()
+def check_admin(id):
+    #cur.execute(f'INSERT INTO  admins (tg_id) VALUES ({id})')
+    #main_db.commit()
+    return cur.execute(f'SELECT * FROM admins WHERE tg_id={id}').fetchall()
 async def db_add_user(state):
     async with state.proxy() as data:
         cur.execute('INSERT INTO  users (tg_id,faculty,course,groupe) VALUES (?,?,?,?)', (tuple(data.values())))
