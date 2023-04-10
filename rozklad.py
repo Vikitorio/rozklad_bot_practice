@@ -10,7 +10,7 @@ from datetime import date, timedelta
 
 users_db.db_init()
 client.register_handlers_client(dp)
-admin.register_handlers_client(dp)
+admin.register_handlers_admin(dp)
 async def on_start(_):
     print("Бот Онлайн")
     """await asyncio.gather(

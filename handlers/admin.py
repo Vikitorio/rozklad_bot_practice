@@ -8,6 +8,7 @@ from keyboards.admin_keyboard import main_admin_keyboard
 from data_base import users_db
 from rozklad_api import ksu_api
 from rozklad_parser import rozklad_file
+from data_validation import data_validation_admin
 import os
 
 admin_keyboard = main_admin_keyboard()
@@ -75,7 +76,7 @@ async def send_news(message: types.Message):
 async def get_faculty_news(message : types.Message,state: FSMContext):
     if message.text == '/Скасувати' or message.text == 'Скасувати':
         await state.finish()
-    else:
+    elif data_validation_admin.check_faculty(message.text):
         async with state.proxy() as data:
             if message.text == "Всім":
                 data['user_id_news'] = message.from_user.id
@@ -93,7 +94,7 @@ async def get_faculty_news(message : types.Message,state: FSMContext):
 async def get_course_news(message : types.Message,state: FSMContext):
     if message.text == '/Скасувати' or message.text == 'Скасувати':
         await state.finish()
-    else:
+    elif data_validation_admin.check_course(message.text):
         async with state.proxy() as data:
             if message.text == "Всім":
                 data['course_news'] = False
@@ -105,23 +106,24 @@ async def get_course_news(message : types.Message,state: FSMContext):
                 await FSMAdmin_news.next()
                 await message.reply("Виберіть групу",reply_markup=admin_keyboard.get_groups_panel(data['faculty_news'],1))
 async def get_groupe_news(message : types.Message,state: FSMContext):
-    if message.text == '/Скасувати' or message.text == 'Скасувати':
-        await state.finish()
-    else:
-        async with state.proxy() as data:
-            if message.text == "Всім":
-                data['groupe_news'] = False
-                await FSMAdmin_news.news_title.set()
+    if data_validation_admin.check_groupe(message.text):
+        if message.text == '/Скасувати' or message.text == 'Скасувати':
+            await state.finish()
+        else:
+            async with state.proxy() as data:
+                if message.text == "Всім":
+                    data['groupe_news'] = False
+                    await FSMAdmin_news.news_title.set()
 
-            else:
-                data['groupe_news'] = message.text
-                await FSMAdmin_news.next()
-                await message.reply("Введіть заголовок",reply_markup=ReplyKeyboardRemove())
+                else:
+                    data['groupe_news'] = message.text
+                    await FSMAdmin_news.next()
+                    await message.reply("Введіть заголовок",reply_markup=admin_keyboard.cancel_panel())
 async def get_news_title(message : types.Message,state: FSMContext):
     async with state.proxy() as data:
         data['news_title'] = message.text
         await FSMAdmin_news.next()
-        await message.reply("Введіть основний текст новини")
+        await message.reply("Введіть основний текст новини", reply_markup=admin_keyboard.cancel_panel())
 async def get_news_body(message : types.Message,state: FSMContext):
     async with state.proxy() as data:
         data['news_body'] = message.text
@@ -134,7 +136,7 @@ async def cansel_admin(message : types.Message,state: FSMContext):
     await message.reply('Операція скасована', reply_markup=admin_keyboard.main_panel())
 
 
-def register_handlers_client(dp : Dispatcher):
+def register_handlers_admin(dp : Dispatcher):
     dp.register_message_handler(cansel_admin, commands=['Скасувати_Операцію'],state="*")
     dp.register_message_handler(start_panel ,commands=['dev'])
     dp.register_message_handler(new_schedule, commands=['Додати_Розклад'])

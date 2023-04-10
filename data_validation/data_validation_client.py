@@ -12,6 +12,7 @@ def check_faculty(faculty):
     return 0
 def check_groupe(groupe):
     for item in group_list.all_group_arr:
-        if groupe == item:
-            return 1
+        for item_item in item:
+            if groupe == item_item:
+                return 1
     return 0

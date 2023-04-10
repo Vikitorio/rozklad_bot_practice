@@ -8,6 +8,7 @@ from keyboards import main_keyboard
 from data_base import users_db
 from rozklad_api import ksu_api
 from rozklad_parser.rozklad_file import get_file
+from data_validation import data_validation_client
 keyboard = main_keyboard()
 
 class FSMAdmin(StatesGroup):
@@ -82,7 +83,7 @@ async def get_faculty(message : types.Message, state: FSMContext):
     if message.text == '/Скасувати' or message.text == 'Скасувати':
         await state.finish()
         await message.answer("Введіть команду", reply_markup=keyboard.rozklad_panel())
-    else:
+    elif data_validation_client.check_faculty(message.text):
         async with state.proxy() as data:
             data['user_id'] = message.from_user.id
             data['faculty'] = message.text
@@ -92,7 +93,7 @@ async def get_course(message : types.Message, state: FSMContext):
     if message.text == '/Скасувати' or message.text == 'Скасувати':
         await state.finish()
         await message.answer("Введіть команду", reply_markup=keyboard.rozklad_panel())
-    else:
+    elif data_validation_client.check_course(message.text):
         async with state.proxy() as data:
             if message.text == '1-магістр':
                 data['course'] = 5
@@ -106,15 +107,13 @@ async def get_groupe(message : types.Message, state: FSMContext):
     if message.text == '/Скасувати' or message.text == 'Скасувати':
         await state.finish()
         await message.answer("Введіть команду", reply_markup=keyboard.rozklad_panel())
-    else:
+    elif data_validation_client.check_groupe(message.text):
         async with state.proxy() as data:
             data['group'] = message.text
         await FSMAdmin.next()
         async with state.proxy() as data:
             await users_db.db_add_user(state)
             await message.answer('Ваші данні збережено',reply_markup=keyboard.rozklad_panel())
-            await message.answer(f'Ваша група {data["group"]}')
-            await rozklad_request(message)
         await state.finish()
 async def cancel_reg(message: types.Message, state: FSMContext):
         current_state = await state.get_state()
@@ -140,5 +139,5 @@ def register_handlers_client(dp : Dispatcher):
     dp.register_message_handler(get_faculty, state=FSMAdmin.faculty)
     dp.register_message_handler(get_course, state=FSMAdmin.course)
     dp.register_message_handler(get_groupe, state=FSMAdmin.groupe)
-    dp.register_message_handler(cancel_reg, commands=['Скасувати_Операцію'], state="*")
+    dp.register_message_handler(cancel_reg, commands=['Скасувати'], state="*")
     dp.register_message_handler(cancel_reg,Text(equals='Скасувати', ignore_case=True), commands=['Скасувати'])
