@@ -64,3 +64,7 @@ class main_admin_keyboard:
                                    KeyboardButton(group_arr[course - 1][x + 1]))
         group_keyboard.add(KeyboardButton('/Скасувати_Операцію'))
         return group_keyboard
+    def cancel_panel(self):
+        keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+        keyboard.add(KeyboardButton('/Скасувати_Операцію'))
+        return keyboard

@@ -38,8 +38,9 @@ async def get_faculty(message : types.Message,state: FSMContext):
         async with state.proxy() as data:
             data['user_id_schedule'] = message.from_user.id
             data['faculty_schedule'] = message.text
+            print(data['faculty_schedule'])
             await FSMAdmin_schedule.next()
-            await message.reply("Завантажте файл",reply_markup=ReplyKeyboardRemove())
+            await message.reply("Завантажте файл",reply_markup=admin_keyboard.cancel_panel())
 async def get_schedue_file(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['file_schedule'] = message.document.file_id
@@ -86,6 +87,7 @@ async def get_faculty_news(message : types.Message,state: FSMContext):
             else:
                 data['user_id_news'] = message.from_user.id
                 data['faculty_news'] = message.text
+                print(data['faculty_news'])
                 await FSMAdmin_news.next()
                 await message.reply("Виберіть курс",reply_markup=admin_keyboard.group_course(1))
 async def get_course_news(message : types.Message,state: FSMContext):
@@ -101,7 +103,7 @@ async def get_course_news(message : types.Message,state: FSMContext):
             else:
                 data['course_news'] = message.text
                 await FSMAdmin_news.next()
-                await message.reply("Виберіть групу",reply_markup=admin_keyboard.get_groups_panel(data['course_news'],1))
+                await message.reply("Виберіть групу",reply_markup=admin_keyboard.get_groups_panel(data['faculty_news'],1))
 async def get_groupe_news(message : types.Message,state: FSMContext):
     if message.text == '/Скасувати' or message.text == 'Скасувати':
         await state.finish()

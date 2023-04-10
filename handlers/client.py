@@ -81,6 +81,7 @@ async def rozklad_file_request(message : types.Message):
 async def get_faculty(message : types.Message, state: FSMContext):
     if message.text == '/Скасувати' or message.text == 'Скасувати':
         await state.finish()
+        await message.answer("Введіть команду", reply_markup=keyboard.rozklad_panel())
     else:
         async with state.proxy() as data:
             data['user_id'] = message.from_user.id
@@ -90,6 +91,7 @@ async def get_faculty(message : types.Message, state: FSMContext):
 async def get_course(message : types.Message, state: FSMContext):
     if message.text == '/Скасувати' or message.text == 'Скасувати':
         await state.finish()
+        await message.answer("Введіть команду", reply_markup=keyboard.rozklad_panel())
     else:
         async with state.proxy() as data:
             if message.text == '1-магістр':
@@ -117,11 +119,8 @@ async def get_groupe(message : types.Message, state: FSMContext):
 async def cancel_reg(message: types.Message, state: FSMContext):
         current_state = await state.get_state()
         print('відміна')
-        if current_state is None:
-            await message.answer("Введіть команду", reply_markup=keyboard.rozklad_panel())
-            return
         await state.finish()
-        await message.answer("Операція скасована", reply_markup = keyboard.rozklad_panel())
+        await message.reply('Операція скасована', reply_markup=keyboard.rozklad_panel())
 
 
 def register_handlers_client(dp : Dispatcher):
@@ -141,5 +140,5 @@ def register_handlers_client(dp : Dispatcher):
     dp.register_message_handler(get_faculty, state=FSMAdmin.faculty)
     dp.register_message_handler(get_course, state=FSMAdmin.course)
     dp.register_message_handler(get_groupe, state=FSMAdmin.groupe)
-    dp.register_message_handler(cancel_reg, state ='*', commands=['Скасувати'])
+    dp.register_message_handler(cancel_reg, commands=['Скасувати_Операцію'], state="*")
     dp.register_message_handler(cancel_reg,Text(equals='Скасувати', ignore_case=True), commands=['Скасувати'])

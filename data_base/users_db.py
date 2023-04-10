@@ -1,5 +1,6 @@
 import sqlite3 as sq
-
+from datetime import date, timedelta
+from handlers import other
 def db_init ():
     global main_db, cur
     main_db = sq.connect('users_data.db')
@@ -21,21 +22,38 @@ def get_users_id_list(faculty,course,groupe):
         filter = filter + f" AND course = '{course}'"
     if groupe != 'False' and groupe != False:
         filter = filter + f" AND groupe = '{groupe}'"
-    print(filter)
-    print(cur.execute(filter).fetchall())
     return cur.execute(filter).fetchall()
 def check_admin(id):
     #cur.execute(f'INSERT INTO  admins (tg_id) VALUES ({id})')
     #main_db.commit()
     return cur.execute(f'SELECT * FROM admins WHERE tg_id={id}').fetchall()
+"""def add_admin(id):
+    if !(cur.execute(f'SELECT * FROM admins WHERE tg_id={id}').fetchall())"""
 async def db_add_user(state):
     async with state.proxy() as data:
         cur.execute('INSERT INTO  users (tg_id,faculty,course,groupe) VALUES (?,?,?,?)', (tuple(data.values())))
         main_db.commit()
 async def delete_user(user_id):
     cur.execute(f'DELETE FROM users WHERE tg_id = {user_id}')
-
-
+    main_db.commit()
+def get_notification_list():
+    users = cur.execute(f'SELECT tg_id FROM users WHERE get_notification = "1"').fetchall()
+    print(users)
+    if users:
+        print(users[0][0])
+        return users[0]
+def get_notification_day():
+    users = cur.execute(f'SELECT tg_id FROM users WHERE next_notification = "{date.today()}"').fetchall()
+    print(users)
+    if users:
+        print(users[0][0])
+        return users[0]
+    return users
+def update_notification_day(id):
+    day = date.today()+timedelta(days=1)
+    print(day)
+    cur.execute(f'UPDATE users SET next_notification = "{day}" WHERE tg_id = {id}')
+    main_db.commit()
 def get_faculty(id):
     user = cur.execute(f'SELECT faculty FROM users WHERE tg_id = {id}').fetchall()[0][0]
     print(user)
@@ -52,3 +70,4 @@ def set_news(id):
 def remove_news(id):
     cur.execute(f'UPDATE users SET get_news = "0" WHERE tg_id = {id}')
     main_db.commit()
+
