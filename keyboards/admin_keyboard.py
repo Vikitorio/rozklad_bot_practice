@@ -68,3 +68,7 @@ class main_admin_keyboard:
         keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
         keyboard.add(KeyboardButton('/Скасувати_Операцію'))
         return keyboard
+    def cancel_pass(self):
+        keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+        keyboard.add(KeyboardButton('/Скасувати_Регістрацію'))
+        return keyboard

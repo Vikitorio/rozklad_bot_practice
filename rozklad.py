@@ -13,15 +13,14 @@ client.register_handlers_client(dp)
 admin.register_handlers_admin(dp)
 async def on_start(_):
     print("Бот Онлайн")
-    """await asyncio.gather(
-        check_time_and_send()
-    )"""
+    #await notification_sender()
 
-"""async def check_time_and_send():
+
+async def notification_sender():
     while True:
         now = datetime.datetime.now()
-        if now.hour == 10:  # Change this to the desired hour
+        if now.hour == 10:
             await other.send_schedule()
-        await asyncio.sleep(3600)"""
+        await asyncio.sleep(3600)
 
 executor.start_polling(dp, skip_updates=True, on_startup=on_start)

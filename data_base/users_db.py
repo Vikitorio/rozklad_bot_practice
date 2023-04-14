@@ -26,9 +26,13 @@ def get_users_id_list(faculty,course,groupe):
 def check_admin(id):
     #cur.execute(f'INSERT INTO  admins (tg_id) VALUES ({id})')
     #main_db.commit()
+    print(cur.execute(f'SELECT * FROM admins WHERE tg_id={id}').fetchall())
     return cur.execute(f'SELECT * FROM admins WHERE tg_id={id}').fetchall()
-"""def add_admin(id):
-    if !(cur.execute(f'SELECT * FROM admins WHERE tg_id={id}').fetchall())"""
+def add_admin(id):
+    print(cur.execute(f'SELECT * FROM admins WHERE tg_id={id}').fetchall())
+    if cur.execute(f'SELECT * FROM admins WHERE tg_id={id}').fetchall() == []:
+        cur.execute(f'INSERT INTO  admins (tg_id) VALUES ({id})')
+        main_db.commit()
 async def db_add_user(state):
     async with state.proxy() as data:
         cur.execute('INSERT INTO  users (tg_id,faculty,course,groupe) VALUES (?,?,?,?)', (tuple(data.values())))

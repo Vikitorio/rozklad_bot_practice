@@ -5,12 +5,13 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher.filters import Text
 from keyboards.admin_keyboard import main_admin_keyboard
+from keyboards.get_rozklad_keyboard import main_keyboard
 from data_base import users_db
 from rozklad_api import ksu_api
 from rozklad_parser import rozklad_file
 from data_validation import data_validation_admin
 import os
-
+client_keyboard = main_keyboard()
 admin_keyboard = main_admin_keyboard()
 async def news_spam(news_title,news_body,faculty = False,course=False,groupe=False):
     arr =users_db.get_users_id_list(faculty,course,groupe)
@@ -22,11 +23,26 @@ class FSMAdmin_schedule(StatesGroup):
     user_id_schedule  = State()
     faculty_schedule = State()
     file_schedule = State()
+
+class FSMAdmin_reg(StatesGroup):
+    admin_pass = State()
+
 async def start_panel(message : types.Message):
     if users_db.check_admin(message.from_user.id):
         await message.answer("Введіть команду",reply_markup=admin_keyboard.main_panel())
-        #await message.reply(message.text)
-
+    else:
+        await FSMAdmin_reg.admin_pass.set()
+        await message.answer("Введіть пароль", reply_markup=admin_keyboard.cancel_pass())
+async def get_pass(message : types.Message,state: FSMContext):
+    async with state.proxy() as data:
+        if message.text == '241dfg':
+            users_db.add_admin(message.from_user.id)
+            await message.answer("Введіть команду", reply_markup=admin_keyboard.main_panel())
+            await state.finish()
+async def cansel_admin_pass(message : types.Message,state: FSMContext):
+    await state.finish()
+    print()
+    await message.answer("Введіть команду", reply_markup=client_keyboard.rozklad_panel())
 
 async def new_schedule(message : types.Message):
         await FSMAdmin_schedule.faculty_schedule.set()
@@ -104,7 +120,7 @@ async def get_course_news(message : types.Message,state: FSMContext):
             else:
                 data['course_news'] = message.text
                 await FSMAdmin_news.next()
-                await message.reply("Виберіть групу",reply_markup=admin_keyboard.get_groups_panel(data['faculty_news'],1))
+                await message.reply("Виберіть групу",reply_markup=admin_keyboard.get_groups_panel(data['faculty_news'],int(data['course_news'])))
 async def get_groupe_news(message : types.Message,state: FSMContext):
     if data_validation_admin.check_groupe(message.text):
         if message.text == '/Скасувати' or message.text == 'Скасувати':
@@ -138,11 +154,12 @@ async def cansel_admin(message : types.Message,state: FSMContext):
 
 def register_handlers_admin(dp : Dispatcher):
     dp.register_message_handler(cansel_admin, commands=['Скасувати_Операцію'],state="*")
+    dp.register_message_handler(cansel_admin_pass, commands=['Скасувати_Регістрацію'], state="*")
     dp.register_message_handler(start_panel ,commands=['dev'])
+    dp.register_message_handler(get_pass, state=FSMAdmin_reg.admin_pass)
     dp.register_message_handler(new_schedule, commands=['Додати_Розклад'])
     dp.register_message_handler(get_faculty, state=FSMAdmin_schedule.faculty_schedule)
     dp.register_message_handler(get_schedue_file,content_types=['document'], state=FSMAdmin_schedule.file_schedule)
-
     dp.register_message_handler(send_news, commands=['Відправити_Новину'])
     dp.register_message_handler(get_faculty_news,  state=FSMAdmin_news.faculty_news)
     dp.register_message_handler(get_course_news, state=FSMAdmin_news.course_news)
